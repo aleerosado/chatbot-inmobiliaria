@@ -23,7 +23,10 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 tokenizer.pad_token = tokenizer.eos_token
 
 def tokenize(batch):
-    return tokenizer(batch["text"], padding="max_length", truncation=True, max_length=512)
+    tokens = tokenizer(batch["text"], padding="max_length", truncation=True, max_length=512)
+    tokens["labels"] = tokens["input_ids"].copy()
+    return tokens
+
 
 tokenized_dataset = dataset.map(tokenize, batched=True)
 
