@@ -2,7 +2,8 @@
 #def generate_response(prompt):
 #    return f"[Respuesta simulada del modelo]: {prompt}"
 
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer
+from peft import AutoPeftModelForCausalLM
 import torch
 
 # Ruta del modelo fine-tuneado
@@ -10,10 +11,10 @@ MODEL_PATH = "models/llama3_finetuned"
 
 # Cargar tokenizer y modelo
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-model = AutoModelForCausalLM.from_pretrained(
+model = AutoPeftModelForCausalLM.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.float16,
-    device_map="auto"  # importante: dejar que accelerate administre la memoria
+    device_map="auto"
 )
 
 def generate_response(prompt):
