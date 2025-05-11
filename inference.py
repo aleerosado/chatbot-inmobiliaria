@@ -3,7 +3,7 @@ from peft import AutoPeftModelForCausalLM
 import torch
 
 # Ruta del modelo entrenado
-MODEL_PATH = "models/llama3_finetuned"
+MODEL_PATH = "models/test_finetune"
 
 # Cargar tokenizer y modelo
 print("🔄 Cargando modelo y tokenizer...")

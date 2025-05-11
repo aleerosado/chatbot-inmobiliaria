@@ -1,31 +1,41 @@
 import pandas as pd
 import torch
 from datasets import Dataset
-from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer
+from transformers import (
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    TrainingArguments,
+    Trainer
+)
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+import os
 
-# Configuración
-MODEL_ID = "NousResearch/Llama-2-7b-hf"
+# Configuración general
+MODEL_ID = "NousResearch/Llama-2-7b-hf"   # puedes cambiar esto por otro si lo necesitas
 CSV_PATH = "training/dataset.csv"
 OUTPUT_DIR = "models/test_finetune"
 
-# Cargar dataset
+# Cargar dataset desde CSV
 df = pd.read_csv(CSV_PATH)
 
-# 🔽 AQUI VA LA FUNCIÓN
+# Formatear cada fila en formato de instrucción
 def format_row(example):
     return f"<|system|>\nEres un asesor inmobiliario profesional.\n<|user|>\n{example['instruction']}: {example['input']}\n<|assistant|>\n{example['output']}"
 
-# Aplicar la función
 df_formatted = df.apply(format_row, axis=1).tolist()
-
-# Crear dataset compatible con HuggingFace
 dataset = Dataset.from_dict({"text": df_formatted})
 
-# Tokenizer
+# Cargar tokenizer
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 tokenizer.pad_token = tokenizer.eos_token
 
+# Añadir tokens especiales si no están
+special_tokens = {
+    "additional_special_tokens": ["<|system|>", "<|user|>", "<|assistant|>"]
+}
+tokenizer.add_special_tokens(special_tokens)
+
+# Tokenizar datos
 def tokenize(batch):
     tokens = tokenizer(batch["text"], padding="max_length", truncation=True, max_length=512)
     tokens["labels"] = tokens["input_ids"].copy()
@@ -33,7 +43,7 @@ def tokenize(batch):
 
 tokenized_dataset = dataset.map(tokenize, batched=True)
 
-# Modelo base en 4bit
+# Cargar modelo base con soporte 4-bit
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
     torch_dtype=torch.float16,
@@ -41,6 +51,9 @@ model = AutoModelForCausalLM.from_pretrained(
     load_in_4bit=True
 )
 model = prepare_model_for_kbit_training(model)
+
+# Redimensionar embeddings para tokens especiales nuevos
+model.resize_token_embeddings(len(tokenizer))
 
 # Configurar LoRA
 lora_config = LoraConfig(
@@ -53,18 +66,18 @@ lora_config = LoraConfig(
 )
 model = get_peft_model(model, lora_config)
 
-# Argumentos de entrenamiento mínimos
+# Argumentos de entrenamiento
 training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
     per_device_train_batch_size=1,
-    num_train_epochs=1,
-    max_steps=4,
+    num_train_epochs=2,
+    logging_dir="./logs",
     logging_steps=1,
     save_strategy="epoch",
     report_to="none"
 )
 
-# Entrenador
+# Crear entrenador
 trainer = Trainer(
     model=model,
     args=training_args,
@@ -72,10 +85,11 @@ trainer = Trainer(
     tokenizer=tokenizer
 )
 
+# Entrenar modelo
 trainer.train()
 
-# Guardar modelo
+# Guardar modelo y tokenizer
 model.save_pretrained(OUTPUT_DIR)
 tokenizer.save_pretrained(OUTPUT_DIR)
 
-print(f"✅ Mini modelo entrenado y guardado en: {OUTPUT_DIR}")
+print(f"✅ Modelo fine-tuneado y guardado en: {OUTPUT_DIR}")
