@@ -5,15 +5,22 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-#modelo entrenado
+# Ruta del modelo fine-tuneado
 MODEL_PATH = "models/llama3_finetuned"
 
 # Cargar tokenizer y modelo
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-model = AutoModelForCausalLM.from_pretrained(MODEL_PATH, torch_dtype=torch.float16, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_PATH,
+    torch_dtype=torch.float16,
+    device_map="auto"  # importante: dejar que accelerate administre la memoria
+)
 
 def generate_response(prompt):
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    # Preparar inputs y mover solo los tensores a la misma ubicación del modelo
+    inputs = tokenizer(prompt, return_tensors="pt")
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
+
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
