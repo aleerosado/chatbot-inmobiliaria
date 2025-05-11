@@ -13,7 +13,7 @@ MODEL_PATH = "models/llama3_finetuned"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model = AutoPeftModelForCausalLM.from_pretrained(
     MODEL_PATH,
-    torch_dtype=torch.float16,
+    torch_dtype=torch.float32,
     device_map="auto",               
     offload_folder="offload"         
 )
