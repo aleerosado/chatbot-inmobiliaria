@@ -1,4 +1,5 @@
 #logica de la rpta del bot, se agregan condiciones teniendo en cuenta las intenciones
+import json
 
 #cargando propiedades
 def cargar_propiedades():
