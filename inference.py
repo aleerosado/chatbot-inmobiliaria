@@ -14,7 +14,9 @@ model = AutoPeftModelForCausalLM.from_pretrained(
     torch_dtype=torch.float32,       # usa float16 si tu GPU lo permite
     device_map="auto",
     offload_folder="offload",
-    is_trainable=False               # 🔒 evita que trate de redimensionar embeddings
+    is_trainable=False,
+    low_cpu_mem_usage=False,
+    mean_resizing=False
 )
 
 # Generador de respuesta
