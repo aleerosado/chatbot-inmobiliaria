@@ -4,7 +4,7 @@ from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForCausalLM, TrainingArguments, Trainer
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 
-MODEL_ID = "TheBloke/Llama-2-7B-Chat-GPTQ"
+MODEL_ID = "NousResearch/Llama-2-7b-hf"
 CSV_PATH = "training/dataset.csv"
 OUTPUT_DIR = "models/llama3_finetuned"
 
