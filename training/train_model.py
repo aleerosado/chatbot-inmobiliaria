@@ -11,7 +11,7 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 import os
 
 # Configuración general
-MODEL_ID = "NousResearch/Llama-2-7b-hf"   # puedes cambiar esto por otro si lo necesitas
+MODEL_ID = "NousResearch/Llama-2-7b-hf"
 CSV_PATH = "training/dataset.csv"
 OUTPUT_DIR = "models/test_finetune"
 
@@ -52,9 +52,6 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model = prepare_model_for_kbit_training(model)
 
-# Redimensionar embeddings para tokens especiales nuevos
-model.resize_token_embeddings(len(tokenizer))
-
 # Configurar LoRA
 lora_config = LoraConfig(
     r=8,
@@ -65,6 +62,9 @@ lora_config = LoraConfig(
     task_type="CAUSAL_LM"
 )
 model = get_peft_model(model, lora_config)
+
+# Redimensionar embeddings para incluir tokens especiales
+model.resize_token_embeddings(len(tokenizer))
 
 # Argumentos de entrenamiento
 training_args = TrainingArguments(
