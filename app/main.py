@@ -1,33 +1,37 @@
 from flask import Flask, request
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
 import os
-import torch
 
-#variables de entorno
+from app.handlers import handle_message
+from app.memory import load_memory, save_memory
+from app.model import generate_response
+
 load_dotenv()
 
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-#Iniciando flask
 app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
-def whatsapp_bot():
-    incoming_msg = request.values.get("Body", "").lower()
-    resp = MessagingResponse()
-    msg = resp.message()
+def whatsapp_webhook():
+    incoming_msg = request.values.get("Body", "").strip()
+    sender = request.values.get("From", "")
 
-    # Respuesta simple temporal
-    if "hola" in incoming_msg:
-        msg.body("¡Hola! ¿Qué tipo de propiedad estás buscando? 🏡")
-    else:
-        msg.body("Soy un bot inmobiliario 🤖, ¿puedo ayudarte a encontrar una propiedad?")
+    memory = load_memory()
+    session = memory.get(sender, {})
 
-    return str(resp)
+    # Procesar mensaje
+    respuesta = handle_message(incoming_msg)
+
+    # Guardar memoria 
+    memory[sender] = session
+    save_memory(memory)
+
+    # Enviar respuesta a Twilio
+    twilio_response = MessagingResponse()
+    twilio_response.message(respuesta)
+    return str(twilio_response)
 
 if __name__ == "__main__":
     app.run(debug=True)

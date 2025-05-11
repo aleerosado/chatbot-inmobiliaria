@@ -1,0 +1,8 @@
+Usuario: Estoy buscando un departamento en San Isidro
+Bot: Claro, ¿cuál es tu presupuesto aproximado?
+
+Usuario: Tengo 150,000 dólares
+Bot: Con ese presupuesto puedo mostrarte opciones en San Isidro y Surco. ¿Te interesa alguno con 3 habitaciones?
+
+Usuario: Sí, con 3 habitaciones
+Bot: Perfecto, tengo uno en San Isidro de 120 m2 con 3 habitaciones y 2 baños. ¿Quieres que agende una visita?

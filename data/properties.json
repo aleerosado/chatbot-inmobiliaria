@@ -1,0 +1,18 @@
+[
+    {
+        "id": 101,
+        "distrito": "Miraflores",
+        "precio": 130000,
+        "habitaciones": 3,
+        "metros": 95,
+        "descripcion": "Departamento con vista al mar"
+    },
+    {
+        "id": 102,
+        "distrito": "Barranco",
+        "precio": 115000,
+        "habitaciones": 2,
+        "metros": 75,
+        "descripcion": "Moderno departamento cerca a galerías de arte"
+    }
+]
