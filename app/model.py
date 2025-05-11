@@ -1,36 +1,43 @@
 #simular rpta de modelo entrenado (se usara hasta antes de entrenar llaMA 3)
 #def generate_response(prompt):
 #    return f"[Respuesta simulada del modelo]: {prompt}"
-
-from transformers import AutoTokenizer
-from peft import AutoPeftModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-# Ruta del modelo fine-tuneado
-MODEL_PATH = "models/llama3_finetuned"
+# Ruta al modelo fine-tuneado y fusionado
+MODEL_PATH = "models/test_finetune_merged"
 
-# Cargar tokenizer y modelo
+# ✅ Cargar tokenizer y modelo
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
-model = AutoPeftModelForCausalLM.from_pretrained(
+
+model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
-    torch_dtype=torch.float32,
-    device_map="auto",               
-    offload_folder="offload"         
+    torch_dtype=torch.float32,   # si tienes GPU con más RAM, puedes usar float16
+    device_map="auto"
 )
 
-def generate_response(prompt):
-    # Preparar inputs y mover solo los tensores a la misma ubicación del modelo
+# 🔁 Función de generación de texto
+def generate_response(user_input):
+    prompt = f"""<|system|>
+Eres un asesor inmobiliario profesional.
+<|user|>
+{user_input}
+<|assistant|>
+"""
+
     inputs = tokenizer(prompt, return_tensors="pt")
     inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
     with torch.no_grad():
         outputs = model.generate(
             **inputs,
-            max_new_tokens=200,
+            max_new_tokens=80,
             do_sample=True,
-            temperature=0.7,
-            top_k=50,
-            top_p=0.95
+            temperature=0.9,
+            top_p=0.6,
+            top_k=50
         )
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response
+
+    decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return decoded.split("<|assistant|>")[-1].strip()
+
