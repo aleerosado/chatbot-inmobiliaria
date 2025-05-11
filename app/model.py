@@ -14,7 +14,8 @@ tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 model = AutoPeftModelForCausalLM.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.float16,
-    device_map={"": "cuda:0"}
+    device_map="auto",               
+    offload_folder="offload"         
 )
 
 def generate_response(prompt):
