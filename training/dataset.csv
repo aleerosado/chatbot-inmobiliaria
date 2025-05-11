@@ -1,0 +1,7 @@
+instruction,input,output
+Buscar propiedades por distrito,Miraflores,"Tenemos varios departamentos en Miraflores desde $120,000. ¿Te interesa alguno cerca al malecón?"
+Filtrar por presupuesto,Hasta 150000 dólares,"Puedo mostrarte opciones entre $100,000 y $150,000 en Barranco, Surco y San Miguel. ¿Tienes un distrito preferido?"
+Mostrar detalles del inmueble,Quiero info del código 101,"El departamento 101 tiene 3 habitaciones, 2 baños, 95 m2, ubicado en Jesús María. Precio: $135,000."
+Agendar visita,Quiero ver el dpto 101,¡Claro! ¿Prefieres agendar tu visita este fin de semana o entre semana?
+Simulación de crédito hipotecario,Tengo 20000 de inicial,"Con una inicial de $20,000 podrías financiar propiedades hasta $120,000. ¿Te gustaría simular con una tasa del BCP?"
+Consultas frecuentes,¿Es posible financiar sin inicial?,"Sí, algunos bancos ofrecen créditos con 0% inicial, aunque requieren buen historial crediticio."
