@@ -1,25 +1,29 @@
-from transformers import AutoTokenizer
-from peft import AutoPeftModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel, PeftConfig
 import torch
 
-# Ruta al modelo entrenado
+# Ruta al modelo fine-tuneado
 MODEL_PATH = "models/test_finetune"
 
-# Cargar tokenizer y modelo
 print("🔄 Cargando modelo y tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
-model = AutoPeftModelForCausalLM.from_pretrained(
-    MODEL_PATH,
-    torch_dtype=torch.float32,       # usa float16 si tu GPU lo permite
-    device_map="auto",
-    offload_folder="offload",
-    is_trainable=False,
-    low_cpu_mem_usage=False,
-    mean_resizing=False
+# 1. Cargar configuración PEFT
+peft_config = PeftConfig.from_pretrained(MODEL_PATH)
+
+# 2. Cargar modelo base original
+base_model = AutoModelForCausalLM.from_pretrained(
+    peft_config.base_model_name_or_path,
+    torch_dtype=torch.float32,  # usa torch.float16 si estás en GPU potente
+    device_map="auto"
 )
 
-# Generador de respuesta
+# 3. Cargar adaptadores LoRA encima del modelo base
+model = PeftModel.from_pretrained(base_model, MODEL_PATH)
+
+# 4. Cargar tokenizer entrenado
+tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+
+# 🧠 Función para generar respuesta
 def generate_response(user_input):
     prompt = f"""<|system|>
 Eres un asesor inmobiliario profesional.
@@ -46,7 +50,7 @@ Eres un asesor inmobiliario profesional.
     respuesta_final = response.split("<|assistant|>")[-1].strip()
     return respuesta_final
 
-# Modo interactivo CLI
+# 💬 Modo interactivo por consola
 if __name__ == "__main__":
     print("\n🟢 Chatbot Inmobiliario Iniciado\n(Escribe 'salir' para terminar)\n")
     while True:
