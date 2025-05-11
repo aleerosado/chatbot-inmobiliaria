@@ -17,8 +17,8 @@ def format_row(example):
         "text": f"<|system|>\nEres un asesor inmobiliario profesional.\n<|user|>\n{example['instruction']}: {example['input']}\n<|assistant|>\n{example['output']}"
     }
 
-df_formatted = df.apply(format_row, axis=1)
-dataset = Dataset.from_pandas(pd.DataFrame({"text": df_formatted}))
+df_formatted = df.apply(format_row, axis=1).tolist()
+dataset = Dataset.from_dict({"text": df_formatted})
 
 #tokenizando : convirtiendo en texto para llama3
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
