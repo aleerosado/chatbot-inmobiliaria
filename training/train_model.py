@@ -13,9 +13,7 @@ df = pd.read_csv(CSV_PATH)
 
 #unir campos para el finetuning 
 def format_row(example):
-    return {
-        "text": f"<|system|>\nEres un asesor inmobiliario profesional.\n<|user|>\n{example['instruction']}: {example['input']}\n<|assistant|>\n{example['output']}"
-    }
+    return f"<|system|>\nEres un asesor inmobiliario profesional.\n<|user|>\n{example['instruction']}: {example['input']}\n<|assistant|>\n{example['output']}"
 
 df_formatted = df.apply(format_row, axis=1).tolist()
 dataset = Dataset.from_dict({"text": df_formatted})
