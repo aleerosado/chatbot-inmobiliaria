@@ -1,21 +1,22 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
-MODEL_PATH = "models/test_finetune"
+# ✅ Ruta al modelo fusionado (base + LoRA integrados)
+MODEL_PATH = "models/test_finetune_merged"
 
 print("🔄 Cargando modelo y tokenizer...")
 
-# Tokenizer entrenado con tokens especiales
+# Cargar tokenizer entrenado
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
-# Modelo completo entrenado y fusionado con adaptadores LoRA
+# Cargar modelo entrenado y fusionado
 model = AutoModelForCausalLM.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.float32,
     device_map="auto"
 )
 
-# Generador de respuesta
+# 🧠 Función para generar respuesta
 def generate_response(user_input):
     prompt = f"""<|system|>
 Eres un asesor inmobiliario profesional.
@@ -42,7 +43,7 @@ Eres un asesor inmobiliario profesional.
     respuesta_final = response.split("<|assistant|>")[-1].strip()
     return respuesta_final
 
-# CLI de prueba
+# Modo interactivo CLI
 if __name__ == "__main__":
     print("\n🟢 Chatbot Inmobiliario Iniciado\n(Escribe 'salir' para terminar)\n")
     while True:
