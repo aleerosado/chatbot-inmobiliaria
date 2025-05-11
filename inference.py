@@ -32,7 +32,10 @@ Eres un asesor inmobiliario profesional.
         outputs = model.generate(
             **inputs,
             max_new_tokens=80,
-            do_sample=False  # determinístico para más velocidad
+            do_sample=True,         # 🔥 modo creativo activado
+            temperature=0.9,
+            top_p=0.6,
+            top_k=50
         )
 
     response = tokenizer.decode(outputs[0], skip_special_tokens=True)
