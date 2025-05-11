@@ -1,25 +1,23 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-from peft import PeftModel
+from transformers import AutoTokenizer
+from peft import AutoPeftModelForCausalLM
 import torch
 
 MODEL_PATH = "models/test_finetune"
 
 print("🔄 Cargando modelo y tokenizer...")
 
-# ✅ Cargar tokenizer entrenado
+# Cargar tokenizer
 tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
 
-# ✅ Cargar modelo base ya extendido con tokens especiales
-base_model = AutoModelForCausalLM.from_pretrained(
+# Cargar modelo completo ya entrenado (base + LoRA + tokens especiales)
+model = AutoPeftModelForCausalLM.from_pretrained(
     MODEL_PATH,
     torch_dtype=torch.float32,
-    device_map="auto"
+    device_map="auto",
+    low_cpu_mem_usage=False  # 🛡️ evita problemas con redimensionamiento
 )
 
-# ✅ Cargar adaptadores LoRA sobre modelo ya extendido
-model = PeftModel.from_pretrained(base_model, MODEL_PATH)
-
-# 🧠 Generar respuesta
+# Función para generar respuesta
 def generate_response(user_input):
     prompt = f"""<|system|>
 Eres un asesor inmobiliario profesional.
@@ -46,7 +44,7 @@ Eres un asesor inmobiliario profesional.
     respuesta_final = response.split("<|assistant|>")[-1].strip()
     return respuesta_final
 
-# 🖥 Modo interactivo
+# CLI interactiva
 if __name__ == "__main__":
     print("\n🟢 Chatbot Inmobiliario Iniciado\n(Escribe 'salir' para terminar)\n")
     while True:
