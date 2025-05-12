@@ -31,16 +31,18 @@ Eres un asesor inmobiliario profesional.
 
         inputs = tokenizer(prompt, return_tensors="pt")
         inputs = {k: v.to(model.device) for k, v in inputs.items()}
-
+        print(f"🧠 Generando respuesta...")
         with torch.no_grad():
             outputs = model.generate(
                 **inputs,
-                max_new_tokens=80,
-                do_sample=True,
-                temperature=0.9,
-                top_p=0.6,
-                top_k=50
+                max_new_tokens=40,        
+                do_sample=False,          
+                temperature=0.7,
+                top_p=1.0,
+                top_k=0
             )
+        print("✅ Generación completada")
+
 
         decoded = tokenizer.decode(outputs[0], skip_special_tokens=True)
         final_response = decoded.split("<|assistant|>")[-1].strip()
