@@ -22,16 +22,18 @@ def handle_message(message):
             f"ID {p['id']}: {p['descripcion']}, {p['habitaciones']} hab, {p['metros']} m2, ${p['precio']}"
             for p in resultados
         ])
-        # 🟢 Estructura de prompt fine-tuneado
+
+        # Prompt más limpio, sin inyectar texto en respuesta
         prompt = f"""<|system|>
 Eres un asesor inmobiliario profesional.
 <|user|>
-Estoy buscando propiedades en {message}. Estas son las opciones:\n{info}
+Estoy buscando propiedades en {message}.
 <|assistant|>
 """
-        return generate_response(prompt)
+        respuesta_modelo = generate_response(prompt)
+        return f"{info}\n\n{respuesta_modelo}"
 
-    # Si no se detecta distrito, usar formato estándar
+    # Si no hay propiedades encontradas, usa el modelo directamente
     prompt = f"""<|system|>
 Eres un asesor inmobiliario profesional.
 <|user|>
