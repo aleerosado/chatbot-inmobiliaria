@@ -4,6 +4,7 @@
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+import time
 
 # Ruta al modelo fine-tuneado y fusionado
 MODEL_PATH = "models/test_finetune_merged"
@@ -33,14 +34,20 @@ Eres un asesor inmobiliario profesional.
         inputs = {k: v.to(model.device) for k, v in inputs.items()}
         print(f"🧠 Generando respuesta...")
         with torch.no_grad():
+            start = time.time()
             outputs = model.generate(
                 **inputs,
-                max_new_tokens=40,        
-                do_sample=False,          
+                max_new_tokens=40,
+                do_sample=True,
                 temperature=0.7,
-                top_p=1.0,
-                top_k=0
+                top_p=0.95,
+                top_k=50
             )
+            end = time.time()
+
+            print(f"✅ Generación completada")
+            print(f"⏱️ Tiempo de generación: {round(end - start, 2)}s")
+
         print("✅ Generación completada")
 
 
